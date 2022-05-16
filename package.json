@@ -6,7 +6,8 @@
   },
   "description": "",
   "scripts": {
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "new": "sh auto-create.sh"
   },
   "author": "",
   "license": "ISC",
