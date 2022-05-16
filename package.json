@@ -1,0 +1,16 @@
+{
+  "name": "tdl-ts",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=12.2.0"
+  },
+  "description": "",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@type-challenges/utils": "^0.1.1"
+  }
+}
