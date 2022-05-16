@@ -1,4 +1,6 @@
 mkdir "./type-challenges/$1"
 touch "./type-challenges/$1/template.ts"
+echo "// question link:" > "./type-challenges/$1/template.ts"
+echo "// https://github.com/type-challenges/type-challenges/blob/main/questions/$2-$1/README.md" >> "./type-challenges/$1/template.ts"
 touch "./type-challenges/$1/test-cases.ts"
 echo "成功创建 $1"
