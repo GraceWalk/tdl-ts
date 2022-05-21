@@ -34,7 +34,7 @@ type First<T extends any[]> = 0 extends T["length"] ? never : T[0];
 type First<T extends any[]> = T extends [infer First, ...infer rest] ? First : never;
 ```
 
-同样使用到了 `Conditional Types`，但是判断的条件和处理都不一样。这里使用了 [infer]() 关键字，
+同样使用到了 `Conditional Types`，但是判断的条件和处理都不一样。这里使用了 [infer](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types) 关键字，
 
 > Conditional types provide us with a way to infer from types we compare against in the true branch using the infer keyword.
 
