@@ -1,4 +1,4 @@
-<div style='width: 100%; margin: 0 auto;'><a href='https://github.com/type-challenges/type-challenges/blob/main/questions/00189-easy-awaited/README.md' target='_blank'><img src='https://img.shields.io/badge/' alt='·' /></a></div>
+<div style='width: 100%; margin: 0 auto;'><a href='https://github.com/type-challenges/type-challenges/blob/main/questions/00189-easy-awaited/README.md' target='_blank'><img src='https://img.shields.io/badge/-189%E3%83%BBAwaited-7aad0c' alt='189 · Awaited' /></a></div>
 
 # 题目注解
 
