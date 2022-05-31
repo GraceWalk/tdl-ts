@@ -2,7 +2,7 @@
 
 There are two main goals of TypeScript:
 
-- Provide an _type system_ for JavaScript.
+- Provide an *type system* for JavaScript.
 - Provide planned features from future JavaScript editions to current JavaScript engines
 - 便于 JavaScript 引擎在运行时做优化
 
@@ -16,18 +16,14 @@ TypeScript 对于隐式类型转换会报错
 // - don't give a runtime error (making debugging hard)
 // - but TypeScript will give a compile time error (making debugging unnecessary)
 //
-{
-}
-+[]; // JS : 0, TS Error
+{} + []; // JS : 0, TS Error
 [] + {}; // JS : "[object Object]", TS Error
-{
-}
-+{}; // JS : NaN or [object Object][object Object] depending upon browser, TS Error
+{} + {}; // JS : NaN or [object Object][object Object] depending upon browser, TS Error
 "hello" - 1; // JS : NaN, TS Error
 
-function add(a, b) {
-  return;
-  a + b; // JS : undefined, TS Error 'unreachable code detected'
+function add(a,b) {
+  return
+    a + b; // JS : undefined, TS Error 'unreachable code detected'
 }
 ```
 
@@ -51,8 +47,8 @@ TypeScript 使用 `:TypeAnnoattion` 这种方式来声明类型。
 
 ```tsx
 interface Name {
-  first: string;
-  second: string;
+	first: string;
+	second: string;
 }
 ```
 
@@ -62,8 +58,8 @@ interface Name {
 
 ```tsx
 var name: {
-  first: string;
-  second: string;
+    first: string;
+    second: string;
 };
 ```
 
@@ -74,6 +70,7 @@ var name: {
 ## any
 
 > It gives you an escape hatch from the type system to tell the compiler to bugger off.
+> 
 
 `any` 在类型系统中与所有类型都能兼容，这意味着任何类型的值都能赋值给一个 `any` 类型的变量，以及一个 `any` 类型的值可以赋值给任何类型的变量。
 
@@ -83,7 +80,7 @@ var name: {
 
 这两者在类型系统中的行为取决于 `strictNullChecks` 这个编译标识。当 `strictNullCheck: false` 时，这两者等同于 `any` 。
 
-- [ ] 示例和补充另一种情况
+- [ ]  示例和补充另一种情况
 
 ## :void
 
@@ -91,7 +88,7 @@ var name: {
 
 ```tsx
 function log(message): void {
-  console.log(message);
+    console.log(message);
 }
 ```
 
@@ -101,11 +98,11 @@ function log(message): void {
 
 ```tsx
 function reverse<T>(items: T[]): T[] {
-  var toreturn = [];
-  for (let i = items.length - 1; i >= 0; i--) {
-    toreturn.push(items[i]);
-  }
-  return toreturn;
+    var toreturn = [];
+    for (let i = items.length - 1; i >= 0; i--) {
+        toreturn.push(items[i]);
+    }
+    return toreturn;
 }
 ```
 
@@ -114,8 +111,8 @@ function reverse<T>(items: T[]): T[] {
 ```tsx
 var sample = [1, 2, 3];
 var reversed = reverse(sample);
-reversed[0] = "1"; // Error!
-reversed = ["1", "2"]; // Error!
+reversed[0] = '1';     // Error!
+reversed = ['1', '2']; // Error!
 ```
 
 # Union Type（联合类型）
@@ -130,18 +127,18 @@ reversed = ["1", "2"]; // Error!
 type objA = {
   a: number;
   b: number;
-};
+}
 
 type objB = {
   b: string;
-};
+}
 
 type objC = objA & objB;
 
 const asdfa: objC = {
   a: 2,
-  b: "3", // (property) b: never
-};
+  b: '3', // (property) b: never
+}
 ```
 
 # Tuple Type（元组类型）
@@ -152,22 +149,98 @@ JavaScript 中不支持元组，我们通常使用数组来表示元组，但是
 var nameNumber: [string, number];
 
 // Okay
-nameNumber = ["Jenny", 8675309];
+nameNumber = ['Jenny', 8675309];
 
 // Error!
-nameNumber = ["Jenny", "867-5309"];
+nameNumber = ['Jenny', '867-5309'];
 ```
 
-但是，我们依然可以通过 `push()` 等方法来增减数组长度，这个时候我们就要使用 `: readonly [typeofmember1, typeofmemeber2]` 来做限制。 `readonly` 限制了这些方法的使用。
+但是，我们依然可以通过  `push()` 等方法来增减数组长度，这个时候我们就要使用 `: readonly [typeofmember1, typeofmemeber2]` 来做限制。 `readonly` 限制了这些方法的使用。
 
 # Type Alias（类型别名）
 
 类型别名提供了给自定义类型起别名的能力，语法为 `type SomeName = someValidTypeAnnotation` 。
 
 > Unlike an `interface` you can give a type alias to literally any type annotation (useful for stuff like union and intersection types).
+> 
 
 那我们什么时候使用 `interface` ，什么时候使用 `type alias` 呢？
 
 > TIP: If you need to have hierarchies(层级) of Type annotations use an `interface`. They can be used with `implements` and `extends`
->
+> 
+> 
 > TIP: Use a type alias for simpler object structures (like `Coordinates`) just to give them a semantic name. Also when you want to give semantic names to Union or Intersection types, a Type alias is the way to go.
+> 
+
+# @types
+
+这里首先介绍了仓库 [Definitely Types](https://github.com/DefinitelyTyped/DefinitelyTyped)，社区目前包含了近 90% 的头部 JavaScript 项目的类型定义。比如我们熟悉的 `[@types/react](https://www.npmjs.com/package/@types/react)` （React 的类型定义）就在这个社区中。 `@types` 包含了全局和模块的类型定义。
+
+## Global `@types`
+
+默认情况下，任何全局使用的类型声明，TypeScript 都默认支持。
+
+## Module `@types`
+
+在安装类型定义后，不需要特殊的配置，我们可以直接通过模块的方式引用库去使用，例如
+
+```tsx
+import react from 'react'
+```
+
+当我们在引入库的时候就自动引入了对应的类型定义文件。
+
+- [ ]  原理
+
+## Controlling Globals
+
+上面我们提到，全局的类型声明默认都会被使用，我们可以通过在 `tsconfig.json` 中提供参数去限制它，
+
+```json
+{
+	"compilerOptions": {
+		"types" : ["jquery"]
+	}
+}
+```
+
+通过上述配置，我们现在只能使用 `jquery` 的定义。
+
+# Ambient Declarations（环境声明）
+
+在本书刚开始我们就提到，
+
+> A major design goal of TypeScript was to make it possible for you to safely and easily use existing JavaScript libraries in TypeScript. TypeScript does this by means of *declaration*.
+> 
+
+TypeScript 的设计目标之一就是让我们能够在 TypeScript 中简单安全地使用现有的 JavaScript 库。TypeScript 使用声明文件来达成它。
+
+## Declaration Files
+
+你可以通过 `declare` 关键字告诉 TypeScript 你在描述其他地方已经存在的 JavaScript 代码。
+
+```json
+foo = 123; // Error: `foo` is not defined
+
+// then
+declare var foo: any;
+foo = 123; // allowed
+```
+
+除了在 `.ts` 文件中声明，你也可以在 `.d.ts` 中声明。在 `.d.ts` 扩展声明文件中，根级别的类型定义必须以 `declare` 关键字开头。这有利于让开发者清楚的知道，在这里 TypeScript 将不会把它编译成任何代码，同时开发者需要确保这些在编译时存在。
+
+- Ambient declarations is a promise that you are making with the compiler. If these do not exist at runtime and you try to use them, things will break without warning.
+- Ambient declarations are like docs. If the source changes the docs need to be kept updated. So you might have new behaviours that work at runtime but no one's updated the ambient declaration and hence you get compiler errors.
+
+## Variables
+
+我们可以给变量声明一个可扩展的类型定义，如
+
+```json
+interface Process {
+    exit(code?: number): void;
+}
+declare var process: Process;
+```
+
+我们利用 `interface` 创建一个类型 `Process` 传给变量 `process` ，当之后需要扩展定义时，只需要修改 `Process` 内的值。
