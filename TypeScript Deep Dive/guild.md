@@ -244,3 +244,229 @@ declare var process: Process;
 ```
 
 我们利用 `interface` 创建一个类型 `Process` 传给变量 `process` ，当之后需要扩展定义时，只需要修改 `Process` 内的值。
+
+# Interfaces
+
+Interfaces 对 JS 运行时的影响为 0。Interfaces 是开放式的，这是 TypeScript 的一个重要原则，即允许你使用 interfaces 模仿 JavaScript 的可扩展性。
+
+```json
+interface xa {
+  a: number;
+}
+
+interface xa {
+  b: string;
+}
+
+const objA: xa = {
+  a: 1,
+  b: '2',
+}
+```
+
+例如在上述例子中我们重复声明了一次 `xa` ，最后的变量 `objA` 同时具备了 `a` 和 `b` 两个属性的类型。
+
+# Enums
+
+枚举是一种组织相关值集合的方法。如下，
+
+```json
+enum CardSuit {
+    Clubs,
+    Diamonds,
+    Hearts,
+    Spades
+}
+
+// Sample usage
+var card = CardSuit.Clubs;
+
+// Safety
+card = "not a member of card suit"; // Error : string is not assignable to type `CardSuit`
+```
+
+枚举的值，比如这里的 `CardSuit.Clubs` 默认为数字，我们称之为 `数字枚举` 。
+
+## Number Enums and Strings
+
+在深入枚举之前，我们先来看一下枚举是怎么生成 JavaScript 的。
+
+```tsx
+// TypeScript Enum
+enum Tristate {
+    False,
+    True,
+    Unknown
+}
+
+// Generated JavaScript
+var Tristate;
+(function (Tristate) {
+    Tristate[Tristate["False"] = 0] = "False";
+    Tristate[Tristate["True"] = 1] = "True";
+    Tristate[Tristate["Unknown"] = 2] = "Unknown";
+})(Tristate || (Tristate = {}));
+```
+
+我们重点看这里， `Tristate[Tristate["False"] = 0] = "False"` 。
+
+首先 `Tristate["False"] = 0` 将 `False` 字段的值设为 0，同时该表达式返回右侧的值 `0` ，这条语句就变成了 `Tristate[0] = "False"` 。结果就是我们得到了一个 `key` 和 `value` 之间双重映射的对象。
+
+```tsx
+[0]); // "False"
+console.log(Tristate["False"]); // 0
+```
+
+## Changing the number associated with a Number Enum
+
+默认情况下，枚举的值从 `0` 开始，并依次加 `1` 。我们可以手动给枚举的字段设置一个数字，这样就会从该数字开始，依次递增。
+
+```tsx
+// 默认的枚举值
+enum Color {
+    Red,     // 0
+    Green,   // 1
+    Blue     // 2
+}
+
+// 手动赋予枚举值
+enum Color {
+    DarkRed = 3,  // 3
+    DarkGreen,    // 4
+    DarkBlue      // 5
+}
+```
+
+## Number Enums as flags
+
+枚举的一大好处是可以用作 `Flags` ，它可以从一组条件中检查某个条件是否为 true，并且一个变量可以同时符合多个条件。
+
+具体案例见链接 [https://basarat.gitbook.io/typescript/type-system/enums#number-enums-as-flags](https://basarat.gitbook.io/typescript/type-system/enums#number-enums-as-flags)。
+
+## String Enums
+
+枚举的值除了数字，还可以是字符串。使用字符串作为枚举值可以使值更富有意义，并且方便 debug。
+
+```tsx
+export enum EvidenceTypeEnum {
+  UNKNOWN = '',
+  PASSPORT_VISA = 'passport_visa',
+  PASSPORT = 'passport',
+}
+```
+
+## Const Enums
+
+我们在上面提到过，枚举实际会生成一个 `key` 和 `value` 双向映射的对象，即 `key: value` `value: key` 。我们在 JavaScript 使用时也需要通过 `obj.aKey` 这种方式来获取枚举值。考虑这样一种情况，
+
+```tsx
+enum Tristate {
+    False,
+    True,
+    Unknown
+}
+
+var lie = Tristate.False;
+```
+
+在 JavaScript 中，我们需要再次访问 `Tristate.False` 来获取 `False` 的值 `0` 。这样过于繁琐且没有必要，这时我们可以使用 `const enum` 来获得性能提升，即不生成一个对象，直接替换值。上边的例子在使用 `const enum` 之后的结果如下，
+
+```tsx
+// const enum
+const enum Tristate {
+    False,
+    True,
+    Unknown
+}
+
+var lie = Tristate.False;
+
+// Generated JavaScript
+var lie = 0;
+```
+
+当然，我们有时既希望直接替换变量的值，同时也希望保留生成的映射对象，比如这里的 `Tristate` 。我们可以使用编译标签 `--preserveConstEnums` 来达到目的。
+
+## Enum With static functions
+
+TypeScript 提供了 `namespace` 去给一个枚举提供一个静态方法，如下，
+
+```tsx
+enum Weekday {
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday
+}
+namespace Weekday {
+    export function isBusinessDay(day: Weekday) {
+        switch (day) {
+            case Weekday.Saturday:
+            case Weekday.Sunday:
+                return false;
+            default:
+                return true;
+        }
+    }
+}
+
+const mon = Weekday.Monday;
+const sun = Weekday.Sunday;
+console.log(Weekday.isBusinessDay(mon)); // true
+console.log(Weekday.isBusinessDay(sun)); // false
+```
+
+我们为枚举 `Weekday` 增加了一个静态方法 `isBusinessDay` 。通过调用 `Weekday.isBusinessDay` 可以很方便地得知某天是否是工作日。
+
+## Enums are open ended
+
+枚举是可扩展的，我们上边提到了枚举的生成函数，这里在贴一下，
+
+```tsx
+var Tristate;
+(function (Tristate) {
+    Tristate[Tristate["False"] = 0] = "False";
+    Tristate[Tristate["True"] = 1] = "True";
+    Tristate[Tristate["Unknown"] = 2] = "Unknown";
+})(Tristate || (Tristate = {}));
+```
+
+注意最后的传参 `(Tristate || (Tristate = {})` 。这里首先会从全局找是否有定义过的 `Tristate` ，如果有直接复用，没有的话初始化为一个空对象 `{}` 。这样就很好理解枚举的可扩展性了。举例来说，如果我们同时定义了两个相同名称的枚举，如下，
+
+```tsx
+// TypeScript
+enum Color {
+    Red,
+    Green,
+    Blue
+}
+
+enum Color {
+    DarkRed = 3,
+    DarkGreen,
+    DarkBlue
+}
+
+// Generated JavaScript
+var Color;
+(function (Color) {
+    Color[Color["Red"] = 0] = "Red";
+    Color[Color["Green"] = 1] = "Green";
+    Color[Color["Blue"] = 2] = "Blue";
+})(Color || (Color = {}));
+
+var Color;
+(function (Color) {
+    Color[Color["DarkRed"] = 3] = "DarkRed";
+    Color[Color["DarkGreen"] = 4] = "DarkGreen";
+    Color[Color["DarkBlue"] = 5] = "DarkBlue";
+})(Color || (Color = {}));
+
+```
+
+生成的对象 `Color` 同时包含了两个枚举的映射关系。
+
+需要注意的是，第二个枚举第一个成员是  `DarkRed = 3` ，即从 3 开始，依次递增。这是为了不和第一个枚举定义的成员冲突。如果不这样做，TypeScript 会提示你（error message `In an enum with multiple declarations, only one declaration can omit an initializer for its first enum element.`）
