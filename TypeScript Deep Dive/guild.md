@@ -2,7 +2,7 @@
 
 There are two main goals of TypeScript:
 
-- Provide an *type system* for JavaScript.
+- Provide an _type system_ for JavaScript.
 - Provide planned features from future JavaScript editions to current JavaScript engines
 - 便于 JavaScript 引擎在运行时做优化
 
@@ -16,14 +16,18 @@ TypeScript 对于隐式类型转换会报错
 // - don't give a runtime error (making debugging hard)
 // - but TypeScript will give a compile time error (making debugging unnecessary)
 //
-{} + []; // JS : 0, TS Error
+{
+}
++[]; // JS : 0, TS Error
 [] + {}; // JS : "[object Object]", TS Error
-{} + {}; // JS : NaN or [object Object][object Object] depending upon browser, TS Error
+{
+}
++{}; // JS : NaN or [object Object][object Object] depending upon browser, TS Error
 "hello" - 1; // JS : NaN, TS Error
 
-function add(a,b) {
-  return
-    a + b; // JS : undefined, TS Error 'unreachable code detected'
+function add(a, b) {
+  return;
+  a + b; // JS : undefined, TS Error 'unreachable code detected'
 }
 ```
 
@@ -47,8 +51,8 @@ TypeScript 使用 `:TypeAnnoattion` 这种方式来声明类型。
 
 ```tsx
 interface Name {
-	first: string;
-	second: string;
+  first: string;
+  second: string;
 }
 ```
 
@@ -58,8 +62,8 @@ interface Name {
 
 ```tsx
 var name: {
-    first: string;
-    second: string;
+  first: string;
+  second: string;
 };
 ```
 
@@ -70,7 +74,6 @@ var name: {
 ## any
 
 > It gives you an escape hatch from the type system to tell the compiler to bugger off.
-> 
 
 `any` 在类型系统中与所有类型都能兼容，这意味着任何类型的值都能赋值给一个 `any` 类型的变量，以及一个 `any` 类型的值可以赋值给任何类型的变量。
 
@@ -80,7 +83,7 @@ var name: {
 
 这两者在类型系统中的行为取决于 `strictNullChecks` 这个编译标识。当 `strictNullCheck: false` 时，这两者等同于 `any` 。
 
-- [ ]  示例和补充另一种情况
+- [ ] 示例和补充另一种情况
 
 ## :void
 
@@ -88,7 +91,7 @@ var name: {
 
 ```tsx
 function log(message): void {
-    console.log(message);
+  console.log(message);
 }
 ```
 
@@ -98,11 +101,11 @@ function log(message): void {
 
 ```tsx
 function reverse<T>(items: T[]): T[] {
-    var toreturn = [];
-    for (let i = items.length - 1; i >= 0; i--) {
-        toreturn.push(items[i]);
-    }
-    return toreturn;
+  var toreturn = [];
+  for (let i = items.length - 1; i >= 0; i--) {
+    toreturn.push(items[i]);
+  }
+  return toreturn;
 }
 ```
 
@@ -111,8 +114,8 @@ function reverse<T>(items: T[]): T[] {
 ```tsx
 var sample = [1, 2, 3];
 var reversed = reverse(sample);
-reversed[0] = '1';     // Error!
-reversed = ['1', '2']; // Error!
+reversed[0] = "1"; // Error!
+reversed = ["1", "2"]; // Error!
 ```
 
 # Union Type（联合类型）
@@ -127,18 +130,18 @@ reversed = ['1', '2']; // Error!
 type objA = {
   a: number;
   b: number;
-}
+};
 
 type objB = {
   b: string;
-}
+};
 
 type objC = objA & objB;
 
 const asdfa: objC = {
   a: 2,
-  b: '3', // (property) b: never
-}
+  b: "3", // (property) b: never
+};
 ```
 
 # Tuple Type（元组类型）
@@ -149,28 +152,25 @@ JavaScript 中不支持元组，我们通常使用数组来表示元组，但是
 var nameNumber: [string, number];
 
 // Okay
-nameNumber = ['Jenny', 8675309];
+nameNumber = ["Jenny", 8675309];
 
 // Error!
-nameNumber = ['Jenny', '867-5309'];
+nameNumber = ["Jenny", "867-5309"];
 ```
 
-但是，我们依然可以通过  `push()` 等方法来增减数组长度，这个时候我们就要使用 `: readonly [typeofmember1, typeofmemeber2]` 来做限制。 `readonly` 限制了这些方法的使用。
+但是，我们依然可以通过 `push()` 等方法来增减数组长度，这个时候我们就要使用 `: readonly [typeofmember1, typeofmemeber2]` 来做限制。 `readonly` 限制了这些方法的使用。
 
 # Type Alias（类型别名）
 
 类型别名提供了给自定义类型起别名的能力，语法为 `type SomeName = someValidTypeAnnotation` 。
 
 > Unlike an `interface` you can give a type alias to literally any type annotation (useful for stuff like union and intersection types).
-> 
 
 那我们什么时候使用 `interface` ，什么时候使用 `type alias` 呢？
 
 > TIP: If you need to have hierarchies(层级) of Type annotations use an `interface`. They can be used with `implements` and `extends`
-> 
-> 
+>
 > TIP: Use a type alias for simpler object structures (like `Coordinates`) just to give them a semantic name. Also when you want to give semantic names to Union or Intersection types, a Type alias is the way to go.
-> 
 
 # @types
 
@@ -185,12 +185,12 @@ nameNumber = ['Jenny', '867-5309'];
 在安装类型定义后，不需要特殊的配置，我们可以直接通过模块的方式引用库去使用，例如
 
 ```tsx
-import react from 'react'
+import react from "react";
 ```
 
 当我们在引入库的时候就自动引入了对应的类型定义文件。
 
-- [ ]  原理
+- [ ] 原理
 
 ## Controlling Globals
 
@@ -198,9 +198,9 @@ import react from 'react'
 
 ```json
 {
-	"compilerOptions": {
-		"types" : ["jquery"]
-	}
+  "compilerOptions": {
+    "types": ["jquery"]
+  }
 }
 ```
 
@@ -210,8 +210,7 @@ import react from 'react'
 
 在本书刚开始我们就提到，
 
-> A major design goal of TypeScript was to make it possible for you to safely and easily use existing JavaScript libraries in TypeScript. TypeScript does this by means of *declaration*.
-> 
+> A major design goal of TypeScript was to make it possible for you to safely and easily use existing JavaScript libraries in TypeScript. TypeScript does this by means of _declaration_.
 
 TypeScript 的设计目标之一就是让我们能够在 TypeScript 中简单安全地使用现有的 JavaScript 库。TypeScript 使用声明文件来达成它。
 
@@ -294,17 +293,17 @@ card = "not a member of card suit"; // Error : string is not assignable to type 
 ```tsx
 // TypeScript Enum
 enum Tristate {
-    False,
-    True,
-    Unknown
+  False,
+  True,
+  Unknown,
 }
 
 // Generated JavaScript
 var Tristate;
 (function (Tristate) {
-    Tristate[Tristate["False"] = 0] = "False";
-    Tristate[Tristate["True"] = 1] = "True";
-    Tristate[Tristate["Unknown"] = 2] = "Unknown";
+  Tristate[(Tristate["False"] = 0)] = "False";
+  Tristate[(Tristate["True"] = 1)] = "True";
+  Tristate[(Tristate["Unknown"] = 2)] = "Unknown";
 })(Tristate || (Tristate = {}));
 ```
 
@@ -324,16 +323,16 @@ console.log(Tristate["False"]); // 0
 ```tsx
 // 默认的枚举值
 enum Color {
-    Red,     // 0
-    Green,   // 1
-    Blue     // 2
+  Red, // 0
+  Green, // 1
+  Blue, // 2
 }
 
 // 手动赋予枚举值
 enum Color {
-    DarkRed = 3,  // 3
-    DarkGreen,    // 4
-    DarkBlue      // 5
+  DarkRed = 3, // 3
+  DarkGreen, // 4
+  DarkBlue, // 5
 }
 ```
 
@@ -349,9 +348,9 @@ enum Color {
 
 ```tsx
 export enum EvidenceTypeEnum {
-  UNKNOWN = '',
-  PASSPORT_VISA = 'passport_visa',
-  PASSPORT = 'passport',
+  UNKNOWN = "",
+  PASSPORT_VISA = "passport_visa",
+  PASSPORT = "passport",
 }
 ```
 
@@ -361,9 +360,9 @@ export enum EvidenceTypeEnum {
 
 ```tsx
 enum Tristate {
-    False,
-    True,
-    Unknown
+  False,
+  True,
+  Unknown,
 }
 
 var lie = Tristate.False;
@@ -374,9 +373,9 @@ var lie = Tristate.False;
 ```tsx
 // const enum
 const enum Tristate {
-    False,
-    True,
-    Unknown
+  False,
+  True,
+  Unknown,
 }
 
 var lie = Tristate.False;
@@ -393,24 +392,24 @@ TypeScript 提供了 `namespace` 去给一个枚举提供一个静态方法，�
 
 ```tsx
 enum Weekday {
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday,
-    Sunday
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday,
+  Sunday,
 }
 namespace Weekday {
-    export function isBusinessDay(day: Weekday) {
-        switch (day) {
-            case Weekday.Saturday:
-            case Weekday.Sunday:
-                return false;
-            default:
-                return true;
-        }
+  export function isBusinessDay(day: Weekday) {
+    switch (day) {
+      case Weekday.Saturday:
+      case Weekday.Sunday:
+        return false;
+      default:
+        return true;
     }
+  }
 }
 
 const mon = Weekday.Monday;
@@ -428,9 +427,9 @@ console.log(Weekday.isBusinessDay(sun)); // false
 ```tsx
 var Tristate;
 (function (Tristate) {
-    Tristate[Tristate["False"] = 0] = "False";
-    Tristate[Tristate["True"] = 1] = "True";
-    Tristate[Tristate["Unknown"] = 2] = "Unknown";
+  Tristate[(Tristate["False"] = 0)] = "False";
+  Tristate[(Tristate["True"] = 1)] = "True";
+  Tristate[(Tristate["Unknown"] = 2)] = "Unknown";
 })(Tristate || (Tristate = {}));
 ```
 
@@ -439,34 +438,98 @@ var Tristate;
 ```tsx
 // TypeScript
 enum Color {
-    Red,
-    Green,
-    Blue
+  Red,
+  Green,
+  Blue,
 }
 
 enum Color {
-    DarkRed = 3,
-    DarkGreen,
-    DarkBlue
+  DarkRed = 3,
+  DarkGreen,
+  DarkBlue,
 }
 
 // Generated JavaScript
 var Color;
 (function (Color) {
-    Color[Color["Red"] = 0] = "Red";
-    Color[Color["Green"] = 1] = "Green";
-    Color[Color["Blue"] = 2] = "Blue";
+  Color[(Color["Red"] = 0)] = "Red";
+  Color[(Color["Green"] = 1)] = "Green";
+  Color[(Color["Blue"] = 2)] = "Blue";
 })(Color || (Color = {}));
 
 var Color;
 (function (Color) {
-    Color[Color["DarkRed"] = 3] = "DarkRed";
-    Color[Color["DarkGreen"] = 4] = "DarkGreen";
-    Color[Color["DarkBlue"] = 5] = "DarkBlue";
+  Color[(Color["DarkRed"] = 3)] = "DarkRed";
+  Color[(Color["DarkGreen"] = 4)] = "DarkGreen";
+  Color[(Color["DarkBlue"] = 5)] = "DarkBlue";
 })(Color || (Color = {}));
-
 ```
 
 生成的对象 `Color` 同时包含了两个枚举的映射关系。
 
-需要注意的是，第二个枚举第一个成员是  `DarkRed = 3` ，即从 3 开始，依次递增。这是为了不和第一个枚举定义的成员冲突。如果不这样做，TypeScript 会提示你（error message `In an enum with multiple declarations, only one declaration can omit an initializer for its first enum element.`）
+需要注意的是，第二个枚举第一个成员是 `DarkRed = 3` ，即从 3 开始，依次递增。这是为了不和第一个枚举定义的成员冲突。如果不这样做，TypeScript 会提示你（error message `In an enum with multiple declarations, only one declaration can omit an initializer for its first enum element.`）
+
+## lib.d.ts [🔗](https://basarat.gitbook.io/typescript/type-system/lib.d.ts#lib.d.ts)
+
+每次安装 TypeScript 时都会附带一个特殊的声明文件 `lib.d.ts` 。此文件包含 JavaScript 运行时和 DOM 中存在的各种常见 JavaScript 构造的环境声明。
+
+```tsx
+var foo = 123;
+var bar = foo.toString();
+```
+
+上述代码可以通过类型校验是因为 `toString` 这个方法已经在 `lib.d.ts` 中定义过了。如果我们在编译时命令行添加 `--noLib` 或者在 `tsconfig.json` 中添加 `"noLib": true` ，代码就无法通过。
+
+我们前面说过， `interface` 是开放式的，意味着我们可以为 `lib.d.ts` 中定义的 interface 添加属性。（注意：需要确保在一个全局模块，例如 `global.d.ts` 中，改变 interface）。
+
+```tsx
+interface Window {
+  helloWorld(): void;
+}
+```
+
+这样我们可以调用 `Window.helloWorld` 并可以通过类型校验了。
+
+出于可维护性的原因，我们推荐创建一个 `global.d.ts` 声明文件。当然，也可以通过在一个文件中使用 `declare global { /*global namespace here*/ }` 来进入全局命名空间。[一个例子](https://basarat.gitbook.io/typescript/type-system/lib.d.ts#example-string-redux)
+
+### 使用你自己的 lib.d.ts
+
+`--noLib` 在以下情况下非常有用：
+
+- 你正在一个定制的 JavaScript 环境中运行，该环境与基于标准浏览器的运行时环境有很大不同。
+- 你希望严格控制代码中可用的全局变量。例如。 lib.d.ts 将 item 定义为全局变量，您不希望它泄漏到您的代码中。
+
+### target: es6
+
+当我们在 `tsconfig.json` 中把 `target` 设为 `es6` 时， `lib.d.ts` 就会多出有关于 `es6` 的环境声明，例如 `Promise` 。如果你想更加精细地控制环境，可以使用 `--lib` 选项。
+
+如果想要生成的代码为 `es5` ，却依旧想使用 `es6` 的语法，我们可以指定 lib 为 `['dom', 'es6]` 。
+
+```tsx
+// 命令行
+tsc --target es5 --lib dom,es6
+// tsconfig.json
+"compilerOptions": {
+    "lib": ["dom", "es6"]
+}
+```
+
+具体支持的内容可以见[链接](https://basarat.gitbook.io/typescript/type-system/lib.d.ts#lib-option)。
+
+一个典型的配置如下，
+
+```tsx
+"compilerOptions": {
+    "target": "es5",
+    "lib": ["es6", "dom"]
+}
+```
+
+一些新的特性在旧版本中不支持，比如 es6 的 Promise 在 es5 中不支持，这时候我们就需要 `Polyfill` 。方式如下，
+
+```tsx
+// 1. 安装 core-js
+npm install core-js --save-dev
+// 2. 在应用全局入口中引入
+import "core-js"
+```
