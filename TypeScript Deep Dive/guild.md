@@ -533,3 +533,80 @@ npm install core-js --save-dev
 // 2. 在应用全局入口中引入
 import "core-js"
 ```
+
+## Functions [🔗](https://basarat.gitbook.io/typescript/type-system/functions)
+
+Functions 这一小节讲了四点，
+
+- Parameter Annotations
+- Return Type Annotation
+- Optional Parameters
+- Overloading
+- Declaring Functions
+
+前三点都比较简单，只看最后亮点。
+
+### Overloading（重载）
+
+一点 Overloading。教程给出的例子如下，
+
+```tsx
+// Overloads
+function padding(all: number);
+function padding(topAndBottom: number, leftAndRight: number);
+function padding(top: number, right: number, bottom: number, left: number);
+// Actual implementation that is a true representation of all the cases the function body needs to handle
+function padding(a: number, b?: number, c?: number, d?: number) {
+  if (b === undefined && c === undefined && d === undefined) {
+    b = c = d = a;
+  } else if (c === undefined && d === undefined) {
+    c = a;
+    d = b;
+  }
+  return {
+    top: a,
+    right: b,
+    bottom: c,
+    left: d,
+  };
+}
+
+// use
+padding(1); // Okay: all
+padding(1, 1); // Okay: topAndBottom, leftAndRight
+padding(1, 1, 1, 1); // Okay: top, right, bottom, left
+
+padding(1, 1, 1); // Error: Not a part of the available overloads
+```
+
+首先看 `padding` 这个函数，根据函数体的判断，我们可以知道函数允许的传入参数的个数分别为为 `1` 、 `2`、 `4` 个，但是除了第一个参数 `a` 之外，其他参数都是可选的（Optional Parameters），也就是我们可以传入三个参数。
+
+此时，我们可以通过函数重载的方式限定函数传入参数的类型，上面这个例子，我们通过重载限定了传入参数是 1、2、4 个。所以我们通过 `padding(1,1,1)` 调用时就会报错，提示 `Not a part of the available overloads` 。
+
+注意，前三次我们只是声明了函数头。而第四次声明包含了函数体，这次声明函数头的参数声明并不对外（只是函数内使用）。但是需要注意，这里的第四次声明一定是兼容前面的函数重载的，因为它才是真实调用的函数。
+
+> Function overloading in TypeScript doesn't come with any runtime overhead. It just allows you to document the manner you expect the function to be called in and the compiler holds the rest of your code in check.
+
+函数重载不会在运行时生成任何东西，只是允许你记录函数调用的限制，并通过编译器去检查。
+
+### Declaring Functions
+
+TypeScript 提供了两种方式在不提供实现的情况下声明一个函数的类型。
+
+```tsx
+type LongHand = {
+  (a: number): number;
+};
+
+// 类似于箭头函数
+type ShortHand = (a: number) => number;
+```
+
+上边这两种声明是完全等价的。不过当你想添加重载时，通过第一种方式很方便实现，
+
+```tsx
+type LongHandAllowsOverloadDeclarations = {
+  (a: number): number;
+  (a: string): string;
+};
+```
