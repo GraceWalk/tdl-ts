@@ -610,3 +610,164 @@ type LongHandAllowsOverloadDeclarations = {
   (a: string): string;
 };
 ```
+
+## Callable（可调用的） [🔗](https://basarat.gitbook.io/typescript/type-system/callable)
+
+这一小节和上一节的重载是关联的。我们除了可以使用类型别名（上一节 Declaring Functions）来表示一个可被调用的类型注解外，还可以使用 interface。
+
+```tsx
+interface ReturnString {
+  (): string;
+}
+
+declare const foo: ReturnString;
+
+const bar = foo(); // bar 被推断为一个字符串。
+```
+
+同样的，它也和类型别名一样支持重载，
+
+```tsx
+interface Overloaded {
+  (foo: string): string;
+  (foo: number): number;
+}
+```
+
+### Arrow Syntax
+
+TypeScript 还提供了一种简便的声明可调用类型的方式——箭头函数。
+
+```tsx
+const simple: (foo: number) => string = (foo) => foo.toString();
+```
+
+### Newable
+
+我们可以通过添加前缀 `new` 来声明一个可实例化的调用，示例如下，
+
+```tsx
+interface CallMeWithNewToGetString {
+  new (): string;
+}
+// Usage
+declare const Foo: CallMeWithNewToGetString;
+const bar = new Foo(); // bar is inferred to be of type string
+```
+
+## Type Assertion（类型断言） [🔗](https://basarat.gitbook.io/typescript/type-system/type-assertion)
+
+TypeScript 允许我们通过 `类型断言` 来覆盖它自身的类型推断。这说明你比编辑器更加清楚这个类型，并且它不应该报错。一个典型的应用场景是将 JavaScript 重构为 TypeScript 时，示例如下，
+
+```tsx
+// 默认情况下，因为 foo 在初始化时是一个空的字面量对象，不包含 bar、bas 属性，所以 TS 报错
+var foo = {};
+foo.bar = 123; // Error: property 'bar' does not exist on `{}`
+foo.bas = "hello"; // Error: property 'bas' does not exist on `{}`
+
+// 通过类型断言后，foo 被断言为 Foo 类型，可以正常添加属性。
+interface Foo {
+  bar: number;
+  bas: string;
+}
+var foo = {} as Foo;
+foo.bar = 123;
+foo.bas = "hello";
+```
+
+类型断言有两种方式（[variable] 只某个变量）：
+
+- [variable] as foo
+- <foo>[variable]
+
+由于第二种方式在 `JSX` 中使用时可能会被识别为 DOM 元素，所以通常情况下推荐第一种写法。
+
+类型断言表明它只是编译时语法，不会转换为运行时的代码，所以它不叫类型转换（Casting），以免造成误解。
+
+### Assertion considered harmful
+
+类型断言是有害的。以上面的例子来说，因为你可能会忘记实际去给 `foo` 这个对象添加某个属性，但是可能之后又使用了这个属性（因为定义了 `Foo` 类型，编译器会提示如 `[foo.bar](http://foo.bar)` `foo.bas` 等属性），这样虽然在编译时不会报错，但是实际运行就报错了。
+
+当然，我们可以直接在创建字面量对象时为其定义类型，这样就保证类型定义与实际的统一。
+
+```tsx
+interface Foo {
+  bar: number;
+  bas: string;
+}
+var foo: Foo = {
+  // the compiler will provide autocomplete for properties of Foo
+};
+```
+
+### Double assertion
+
+类型断言并安全，但在某些情况下还有有用的，比如，
+
+```tsx
+function handler(event: Event) {
+  const mouseEvent = event as MouseEvent;
+}
+```
+
+当我们了解传入参数 `event` 更具体的类型 `MouseEvent` ，我们可以直接断言为这个类型。
+
+类型断言是有限制条件的。当  `S` 类型是  `T`  类型的子集，或者  `T`  类型是  `S`  类型的子集时，`S`  能被成功断言成  `T`。这是为了在进行类型断言时提供额外的安全性，完全毫无根据的断言是危险的，如果你想这么做，你可以使用  `any`。
+
+## Freshness [🔗](https://basarat.gitbook.io/typescript/type-system/freshness)
+
+Freshness 直译过来是 `新鲜` 的意思。TypeScript 为了让检查对象字面量类型更容易，提供了 `Freshness` 的概念（也被称为更严格的对象字面量检查）来确保对象字面量在结构上兼容。
+
+结构类型（structural typing）的方便之处在于可以很方便的把 JavaScript 迁移到 TypeScript，
+
+```tsx
+function logName(something: { name: string }) {
+  console.log(something.name);
+}
+
+var person = { name: "matt", job: "being awesome" };
+var animal = { name: "cow", diet: "vegan, but has milk of own species" };
+var random = { note: `I don't have a name property` };
+
+logName(person); // okay
+logName(animal); // okay
+logName(random); // Error: property `name` is missing
+```
+
+这个例子里，虽然传入 `logName` 方法的 `person` 和 `animal` 对象除了方法定义的 `name` 属性外，还多了其他属性，但是依旧是兼容的，TS 不会报错。当然，如果没有传入 `name` 属性，如 `random` 对象，还是回报错的。
+
+当然，它也有一个缺点是，会让我们误以为方法能够接受更多实际上不存在的属性。当我们直接在该方法传入 `对象字面量` 时，TypeScript 就会报错，
+
+```tsx
+function logName(something: { name: string }) {
+  console.log(something.name);
+}
+
+logName({ name: "matt" }); // okay
+logName({ name: "matt", job: "being awesome" }); // Error: object literals must only specify known properties. `job` is excessive here.
+```
+
+另一个典型场景是与具有可选成员的接口一起使用，对象字面量检查能够有效的避免输入拼写错误的单词，
+
+```tsx
+function logIfHasName(something: { name?: string }) {
+  if (something.name) {
+    console.log(something.name);
+  }
+}
+var person = { name: "matt", job: "being awesome" };
+var animal = { name: "cow", diet: "vegan, but has milk of own species" };
+
+logIfHasName(person); // okay
+logIfHasName(animal); // okay
+logIfHasName({ neme: "I just misspelled name to neme" }); // Error: object literals must only specify known properties. `neme` is excessive here.
+```
+
+### Allowing extra properties（允许额外的参数）
+
+一个类型能够包含索引签名，以明确表明可以使用额外的属性，
+
+```tsx
+var x: { foo: number; [x: string]: unknown };
+x = { foo: 1, baz: 2 }; // Ok, `baz` matched by index signature
+```
